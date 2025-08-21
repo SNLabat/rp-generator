@@ -192,6 +192,17 @@
             box-shadow: 0 12px 30px rgba(46, 139, 87, 0.4);
         }
 
+        .crime-btn {
+            background: linear-gradient(45deg, #4B0082, #8A2BE2);
+            box-shadow: 0 8px 20px rgba(75, 0, 130, 0.3);
+        }
+
+        .crime-btn:hover {
+            background: linear-gradient(45deg, #6A0DAD, #4B0082);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(75, 0, 130, 0.4);
+        }
+
         .placeholder-text {
             color: #666;
             font-size: 1.1rem;
@@ -224,7 +235,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>RP Character Generator</h1>
+        <h1>Roleplay Generator</h1>
         <p class="subtitle">For Those Without Creativity</p>
         
         <div class="character-display">
@@ -235,6 +246,7 @@
         <div class="button-container">
             <button class="generate-btn criminal-btn" onclick="generateCharacter('criminal')">Criminal</button>
             <button class="generate-btn civilian-btn" onclick="generateCharacter('civilian')">Civilian</button>
+            <button class="generate-btn crime-btn" onclick="generateCrime()">Crime Generator (In Beta)</button>
         </div>
     </div>
 
@@ -798,6 +810,340 @@
             "secretly judges people's character based on how they treat shopping carts", "practices different ways to sneeze politely"
         ];
 
+        // Grammatically Correct Crime Generator Components
+        
+        // Crime types that take NOUN targets
+        const nounCrimeTypes = [
+            "Theft of", "Burglary of", "Robbery of", "Embezzlement of", "Identity theft of",
+            "Counterfeiting", "Smuggling", "Sabotage of", "Forgery of", "Grand theft of",
+            "Arson targeting", "Kidnapping", "Copyright infringement of", "Patent theft of",
+            "Price fixing of", "Tampering with"
+        ];
+
+        const nounTargets = [
+            "the city's emergency rubber duck supply",
+            "a professional mime's invisible prop collection",
+            "funds meant for public mime training",
+            "fake certificates for professional sock folding",
+            "a museum's historic lint specimen collection",
+            "artisanal air fresheners shaped like philosophers",
+            "a bank's promotional stress ball collection",
+            "collectible grocery shopping lists",
+            "elevator music compositions",
+            "revolutionary sock drawer organization methods",
+            "warehouses full of rejected motivational posters",
+            "mascot costumes during minor league baseball games",
+            "all 'Employees Must Wash Hands' signs",
+            "underground origami competition networks",
+            "ice cream trucks at children's birthday parties",
+            "a therapist's stress ball inventory",
+            "the mayor's secret stash of emergency snacks",
+            "a crossing guard's whistle collection",
+            "someone's comprehensive sock drawer",
+            "a dentist's collection of extracted teeth",
+            "the world's largest ball of yarn",
+            "a barista's collection of misspelled customer names",
+            "a janitor's archive of confiscated items",
+            "tourist selfies from the local museum",
+            "a security guard's incident report poetry",
+            "expired grocery store coupons worth millions",
+            "public domain elevator music",
+            "virtual real estate in non-existent metaverses",
+            "fake warranties for houseplants",
+            "oversized foam fingers at sporting events",
+            "emergency backup kazoos from the fire department",
+            "fortune cookies from Chinese restaurants",
+            "greeting cards for occasions that don't exist",
+            "all the 'Reserved' signs from restaurants",
+            "doorknobs from a retirement home",
+            "rubber chickens from novelty stores",
+            "library books about how to return library books"
+        ];
+
+        // Crime types that take ACTION targets (verb phrases)
+        const actionCrimeTypes = [
+            "Fraud involving", "Blackmail using", "Money laundering through", "Tax evasion using",
+            "Bribery of", "Running a Ponzi scheme using", "Insider trading with", "Wire fraud involving",
+            "Mail fraud using", "Healthcare fraud involving", "Securities fraud with", "Election fraud using",
+            "Welfare fraud involving", "Extortion using", "Racketeering through", "Witness intimidation through"
+        ];
+
+        const actionTargets = [
+            "embarrassing parallel parking photos",
+            "pet rocks claimed as tax dependents",
+            "homemade cookies given to parking meter attendants",
+            "signatures on get-well cards for imaginary patients",
+            "fortune cookie predictions",
+            "artisanal twist ties sold at farmers markets",
+            "fake decorative traffic cone orders",
+            "forged love letters between garden gnomes",
+            "laughter therapy prescriptions for everything",
+            "companies that only exist on Tuesdays",
+            "ballot boxes stuffed with 'None of the Above' votes",
+            "support claims for 47 houseplants",
+            "threats about secret belly button lint collections",
+            "aggressive compliments and unsolicited life advice",
+            "fake accounts created for inanimate objects",
+            "overly positive comments left on everything",
+            "strongly worded thank you notes",
+            "positive reviews written for everything",
+            "glitter bombs and confetti used as threats"
+        ];
+
+        // Crime types that take GERUND targets (verb-ing phrases)
+        const gerundCrimeTypes = [
+            "Hacking into", "Breaking and entering into", "Assault with", "Disturbing the peace by",
+            "Loitering with intent to", "Noise violations from", "Illegal gambling on",
+            "Unlawful assembly of", "Obstruction of justice by", "Contempt of court for", "Perjury involving"
+        ];
+
+        const gerundTargets = [
+            "the city's traffic lights to make them play elevator music",
+            "a competitive eating contest to substitute tofu for hot dogs",
+            "unsuccessful lemonade stand operations",
+            "people's dreams to rearrange their furniture",
+            "a deadly rubber chicken during organized food fights",
+            "organizing flash mobs in library quiet sections",
+            "leaving anonymous thank you notes in restricted areas",
+            "dropping biodegradable confetti with positive affirmations",
+            "complimenting strangers on their shoe choices",
+            "practicing interpretive dance in hallways",
+            "betting on which elevator will arrive first",
+            "gathering people wearing the same unusual hat",
+            "hiding evidence in elaborate origami sculptures",
+            "correcting the judge's grammar during proceedings",
+            "testifying about the emotional lives of houseplants",
+            "smart refrigerators to change temperature by one degree",
+            "social media influencers with zero followers",
+            "people who still use dial-up internet",
+            "all email signatures to change them to comic sans",
+            "websites to add too many exclamation points",
+            "old social media posts obsessively",
+            "crossing guards in digital spaces",
+            "memes that weren't funny to begin with",
+            "parking meters to make them accept monopoly money",
+            "rechargeable AA batteries as weapons",
+            "garden gnomes in their own yard",
+            "aggressive kindness and unsolicited hugs",
+            "a spoon as a threatening weapon",
+            "teddy bears in a toy store",
+            "inflatable lawn decorations during holidays",
+            "houseplants through overwatering",
+            "pinatas at children's parties",
+            "interpretive dance performances to intimidate",
+            "following people to return their lost items"
+        ];
+
+        // Crime types for CONSPIRACY (special case)
+        const conspiracyCrimeTypes = ["Conspiracy to steal", "Trespassing to", "Littering by"];
+
+        const conspiracyTargets = [
+            "all the left shoes from a bowling alley",
+            "every 'Wet Paint' sign in the city",
+            "all the lost socks from laundromats",
+            "restricted areas to leave thank you notes",
+            "public spaces while dropping biodegradable confetti",
+            "libraries while practicing interpretive dance"
+        ];
+
+        const scenarios = [
+            "During a senior citizen bowling tournament",
+            "While city hall hosts a rubber duck convention",
+            "At a professional development conference for mimes",
+            "During the museum's 'Lint Through the Ages' exhibition",
+            "While wearing a disguise made entirely of office supplies",
+            "During a lunar eclipse viewing party",
+            "While maintaining perfect customer service etiquette",
+            "Every Tuesday at exactly 3:47 PM",
+            "Using only items purchased from a dollar store",
+            "While humming elevator music continuously",
+            "During mandatory team building exercises",
+            "While dressed as your astrological sign",
+            "At underground bingo nights in the community center",
+            "Using trained carrier pigeons as accomplices",
+            "During interpretive dance flash mob performances",
+            "While practicing mindfulness meditation techniques",
+            "At farmers market opening ceremonies",
+            "Using only biodegradable and eco-friendly materials",
+            "During community theater auditions for 'Hamlet'",
+            "While maintaining a detailed expense report",
+            "At library story time sessions",
+            "While following a strict vegan diet",
+            "During senior center quilting circles",
+            "Using exclusively public transportation",
+            "At neighborhood watch meetings",
+            "While wearing only clothes from thrift stores",
+            "During yoga instructor certification classes",
+            "Using kitchen utensils as your primary tools",
+            "At amateur photography workshops",
+            "While practicing different regional accents",
+            "During dog park social hours",
+            "Using only items purchased with exact change",
+            "At community garden planning meetings",
+            "While maintaining perfect posture throughout",
+            "During local food truck festivals",
+            "Using origami as your primary communication method",
+            "At charity bake sales for the fire department",
+            "While keeping a detailed crime journal",
+            "During mall walking group sessions",
+            "Using only recyclable materials",
+            "At book club discussions about romance novels",
+            "While practicing gratitude meditation",
+            "During amateur astronomy club meetings",
+            "Using a mariachi band as a distraction",
+            "At community college pottery classes",
+            "While maintaining perfect work-life balance",
+            "During town hall meetings about parking meters",
+            "While practicing random acts of kindness throughout",
+            // TIME-BASED SCENARIOS
+            "Every leap year during the extra day",
+            "Only during commercials on TV",
+            "At exactly 11:11 when making a wish",
+            "During the five minutes before closing time",
+            "While waiting for the microwave to finish",
+            "Only on days that end in 'y'",
+            "During the awkward pause between songs",
+            "While stuck in an elevator between floors",
+            "At 3 AM when everything seems like a good idea",
+            "During the time it takes for toast to pop up",
+            "Only during Mercury retrograde",
+            "While waiting for paint to dry",
+            "During commercial breaks of infomercials",
+            "At the exact moment of sneezing",
+            "While counting to ten before responding",
+            "Only during daylight saving time transitions",
+            "During the loading screen of video games",
+            "While waiting for the perfect parking spot",
+            "At the precise moment of parallel parking",
+            "During the awkward silence after telling a joke",
+            // LOCATION-BASED SCENARIOS
+            "In the waiting room of a dental office",
+            "At a 24-hour laundromat at 2 AM",
+            "In the lost and found section of the mall",
+            "At a self-checkout that keeps malfunctioning",
+            "In the express lane with clearly more than 10 items",
+            "At a drive-through ordering only water",
+            "In an empty movie theater during a matinee",
+            "At a public restroom with automatic sensors",
+            "In the break room microwave line",
+            "At a gas station that only accepts exact change",
+            "In an elevator with broken floor buttons",
+            "At a coffee shop ordering the most complicated drink",
+            "In a hospital waiting room with Wi-Fi problems",
+            "At a bank during the lunch rush",
+            "In a department store changing room with no mirror",
+            "At a library computer with sticky keys",
+            "In a parking garage with confusing directions",
+            "At a restaurant with a server who's clearly new",
+            "In a hotel lobby with extremely slow elevators",
+            "At a post office right before closing",
+            // METHOD-BASED SCENARIOS
+            "Using only interpretive dance to communicate",
+            "While speaking exclusively in rhyming couplets",
+            "Using a translator app for everything",
+            "While wearing oven mitts on both hands",
+            "Using only fortune cookie fortunes as scripts",
+            "While communicating through charades",
+            "Using a Magic 8-Ball for all decisions",
+            "While walking backwards everywhere",
+            "Using only yes or no questions",
+            "While singing everything like a musical",
+            "Using sock puppets as spokespersons",
+            "While hopping on one foot for luck",
+            "Using only drawing pictures to communicate",
+            "While wearing sunglasses indoors for mystery",
+            "Using a ventriloquist dummy as an accomplice",
+            "While doing the moonwalk between locations",
+            "Using only movie quotes for conversation",
+            "While juggling stress balls throughout",
+            "Using a kazoo for all important announcements",
+            "While wearing a cape for dramatic effect",
+            // WEATHER/SEASONAL SCENARIOS
+            "During the first snowfall of winter",
+            "While it's raining but only on Tuesdays",
+            "During a heatwave over 90 degrees",
+            "While wearing winter clothes in summer",
+            "During the spring cleaning frenzy",
+            "While it's too windy to use an umbrella",
+            "During the autumn leaf-peeping season",
+            "While experiencing seasonal allergies",
+            "During a thunderstorm with perfect timing",
+            "While the weather is unseasonably perfect",
+            "During the summer tourist invasion",
+            "While experiencing cabin fever in winter",
+            "During the brief perfect weather window",
+            "While it's too hot to think clearly",
+            "During the holiday decoration season",
+            "While experiencing weather whiplash",
+            "During the annual migration of tourists",
+            "While wearing flip-flops in snow",
+            "During the time change confusion period",
+            "While the weather app is constantly wrong",
+            // SOCIAL SCENARIOS
+            "During family reunion small talk sessions",
+            "While attending a wedding where you know nobody",
+            "During a high school reunion planning committee",
+            "While stuck in a conversation about weather",
+            "During a potluck where everyone brought dessert",
+            "While attending a workshop on communication skills",
+            "During a birthday party for someone you just met",
+            "While participating in mandatory fun activities",
+            "During a networking event with terrible name tags",
+            "While attending a book club for a book nobody read",
+            "During a group project with incompatible schedules",
+            "While playing icebreaker games with strangers",
+            "During a dinner party with dietary restrictions",
+            "While attending a lecture about something boring",
+            "During a team meeting that could have been an email",
+            "While participating in a focus group about snacks",
+            "During a conference call with bad audio",
+            "While attending a motivational speaker's presentation",
+            "During a party where you only know the host",
+            "While participating in a trust fall exercise",
+            // TECHNOLOGY SCENARIOS
+            "While trying to connect to public Wi-Fi",
+            "During a video call with terrible lag",
+            "While auto-correct keeps changing everything",
+            "During a software update that takes forever",
+            "While trying to remember a password",
+            "During a phone call with bad reception",
+            "While GPS is recalculating the route",
+            "During a presentation with technical difficulties",
+            "While trying to explain technology to relatives",
+            "During a printer jam emergency",
+            "While waiting for a large file to download",
+            "During a live stream with connection issues",
+            "While trying to take the perfect selfie",
+            "During a video game loading screen",
+            "While dealing with a frozen computer",
+            "During a smart home malfunction",
+            "While trying to untangle earphone wires",
+            "During a social media algorithm update",
+            "While explaining memes to confused adults",
+            "During a backup that's taking hours",
+            // FOOD-RELATED SCENARIOS
+            "While waiting for water to boil",
+            "During the great pineapple pizza debate",
+            "While trying to open impossible packaging",
+            "During a potluck planning committee meeting",
+            "While attempting to eat soup gracefully",
+            "During a cooking show binge-watching session",
+            "While reading nutrition labels obsessively",
+            "During a diet that starts on Monday",
+            "While meal prepping for the entire week",
+            "During a food truck festival decision paralysis",
+            "While trying to split a restaurant bill",
+            "During a spice tolerance challenge",
+            "While attempting to look sophisticated at wine tasting",
+            "During a midnight snack raid",
+            "While explaining food allergies to confused servers",
+            "During a grocery shopping trip without a list",
+            "While trying to make small talk with a barista",
+            "During a cooking disaster recovery mission",
+            "While attempting to eat corn on the cob gracefully",
+            "During a debate about the correct way to pronounce 'gif'"
+        ];
+
 
 
 
@@ -830,6 +1176,49 @@
                 typeElement.textContent = characterType;
                 typeElement.className = 'character-type';
                 quirkElement.textContent = quirk;
+                
+                typeElement.style.opacity = '1';
+                quirkElement.style.opacity = '1';
+            }, 150);
+        }
+
+        function generateCrime() {
+            // Randomly choose which type of crime to generate
+            const crimeTypeCategory = Math.floor(Math.random() * 4);
+            let crimeType, target;
+            
+            if (crimeTypeCategory === 0) {
+                // Noun-based crimes (Theft of X, Robbery of Y)
+                crimeType = nounCrimeTypes[Math.floor(Math.random() * nounCrimeTypes.length)];
+                target = nounTargets[Math.floor(Math.random() * nounTargets.length)];
+            } else if (crimeTypeCategory === 1) {
+                // Action-based crimes (Fraud involving X, Blackmail using Y)
+                crimeType = actionCrimeTypes[Math.floor(Math.random() * actionCrimeTypes.length)];
+                target = actionTargets[Math.floor(Math.random() * actionTargets.length)];
+            } else if (crimeTypeCategory === 2) {
+                // Gerund-based crimes (Hacking into X, Loitering with intent to Y)
+                crimeType = gerundCrimeTypes[Math.floor(Math.random() * gerundCrimeTypes.length)];
+                target = gerundTargets[Math.floor(Math.random() * gerundTargets.length)];
+            } else {
+                // Conspiracy crimes (special grammatical structure)
+                crimeType = conspiracyCrimeTypes[Math.floor(Math.random() * conspiracyCrimeTypes.length)];
+                target = conspiracyTargets[Math.floor(Math.random() * conspiracyTargets.length)];
+            }
+            
+            // Create the grammatically correct crime
+            const crime = `${crimeType} ${target}`;
+            
+            const typeElement = document.querySelector('.character-type');
+            const quirkElement = document.querySelector('.character-quirk');
+            
+            // Add animation effect
+            typeElement.style.opacity = '0';
+            quirkElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                typeElement.textContent = crime;
+                typeElement.className = 'character-type';
+                quirkElement.textContent = '';
                 
                 typeElement.style.opacity = '1';
                 quirkElement.style.opacity = '1';
