@@ -163,6 +163,35 @@
             left: 100%;
         }
 
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .criminal-btn {
+            background: linear-gradient(45deg, #8B0000, #4A0E0E);
+            box-shadow: 0 8px 20px rgba(139, 0, 0, 0.3);
+        }
+
+        .criminal-btn:hover {
+            background: linear-gradient(45deg, #A52A2A, #8B0000);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(139, 0, 0, 0.4);
+        }
+
+        .civilian-btn {
+            background: linear-gradient(45deg, #2E8B57, #228B22);
+            box-shadow: 0 8px 20px rgba(46, 139, 87, 0.3);
+        }
+
+        .civilian-btn:hover {
+            background: linear-gradient(45deg, #3CB371, #2E8B57);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(46, 139, 87, 0.4);
+        }
+
         .placeholder-text {
             color: #666;
             font-size: 1.1rem;
@@ -203,12 +232,111 @@
             <div class="character-quirk"></div>
         </div>
         
-        <button class="generate-btn" onclick="generateCharacter()">Generate Character</button>
+        <div class="button-container">
+            <button class="generate-btn criminal-btn" onclick="generateCharacter('criminal')">Criminal</button>
+            <button class="generate-btn civilian-btn" onclick="generateCharacter('civilian')">Civilian</button>
+        </div>
     </div>
 
     <script>
-        // Dynamic character generation system with expanded pools
-        const characterPrefixes = [
+        // Criminal-themed character generation
+        const criminalPrefixes = [
+            "Reformed", "Hardened", "Small-time", "Professional", "Desperate", "Cunning", "Reckless",
+            "Paranoid", "Calculating", "Hot-headed", "Cold-blooded", "Impulsive", "Methodical",
+            "Unstable", "Charming", "Intimidating", "Sloppy", "Meticulous", "Vengeful", "Greedy",
+            "Power-hungry", "Cornered", "Overconfident", "Cautious", "Violent", "Smooth-talking",
+            "Treacherous", "Loyal", "Backstabbing", "Honor-bound", "Ruthless", "Merciful",
+            "Experienced", "Novice", "Veteran", "Retired", "Active", "Underground", "High-profile",
+            "Low-key", "Notorious", "Anonymous", "Feared", "Respected", "Hated", "Misunderstood",
+            "Psychopathic", "Sociopathic", "Narcissistic", "Manipulative", "Charismatic", "Antisocial",
+            "Paranoid", "Obsessive", "Compulsive", "Addicted", "Clean", "Dirty", "Connected",
+            "Isolated", "Family-oriented", "Lone-wolf", "Gang-affiliated", "Independent",
+            "Territorial", "Nomadic", "Urban", "Rural", "International", "Local", "Regional",
+            "Tech-savvy", "Old-school", "Modern", "Traditional", "Innovative", "Conservative"
+        ];
+
+        const criminalJobs = [
+            "bank robber", "car thief", "pickpocket", "burglar", "shoplifter", "con artist", "scam artist",
+            "fraudster", "embezzler", "money launderer", "counterfeiter", "forger", "identity thief",
+            "hacker", "cybercriminal", "phone scammer", "credit card skimmer", "ATM hacker",
+            "drug dealer", "drug runner", "drug manufacturer", "smuggler", "trafficker", "pusher",
+            "hitman", "assassin", "enforcer", "muscle", "bodyguard", "debt collector", "loan shark",
+            "bookmaker", "gambling operator", "numbers runner", "casino cheater", "card counter",
+            "fence", "stolen goods dealer", "chop shop operator", "parts thief", "cargo thief",
+            "jewelry thief", "art thief", "antique thief", "rare book thief", "museum robber",
+            "protection racketeer", "extortionist", "blackmailer", "kidnapper", "human trafficker",
+            "arms dealer", "weapons smuggler", "gunrunner", "explosives expert", "bomb maker",
+            "arsonist", "vandal", "graffiti artist", "street racer", "getaway driver", "wheelman",
+            "safecracker", "locksmith", "security bypasser", "alarm specialist", "surveillance expert",
+            "mob boss", "crime family head", "underboss", "lieutenant", "soldier", "associate",
+            "gang leader", "gang member", "crew chief", "street captain", "territory manager",
+            "pimp", "prostitute", "escort", "madame", "brothel operator", "sex trafficker",
+            "bootlegger", "moonshiner", "illegal distiller", "contraband smuggler", "black marketeer",
+            "ticket scalper", "scalper", "street vendor", "unlicensed dealer", "gray market trader",
+            "check forger", "document falsifier", "passport forger", "visa scammer", "immigration fraudster",
+            "insurance fraudster", "worker's comp scammer", "disability fraudster", "welfare cheat",
+            "tax evader", "offshore account holder", "shell company operator", "pyramid scheme operator",
+            "Ponzi scheme runner", "investment fraudster", "securities manipulator", "insider trader",
+            "corporate spy", "industrial spy", "trade secret thief", "patent infringer", "IP pirate",
+            "software pirate", "content pirate", "bootleg distributor", "counterfeit manufacturer",
+            "corrupt politician", "bribe taker", "influence peddler", "vote buyer", "election rigger"
+        ];
+
+        const criminalQuirks = [
+            "never uses their real name, even with close associates",
+            "compulsively wipes down everything they touch to avoid fingerprints",
+            "only conducts business in public places with multiple exits",
+            "speaks entirely in code words that don't make sense to anyone else",
+            "never carries more than $20 in cash to avoid suspicion",
+            "has a different burner phone for every day of the week",
+            "only trusts people who have done time in the same prison",
+            "compulsively checks over their shoulder every 30 seconds",
+            "never sleeps in the same place twice in a row",
+            "only eats at 24-hour diners because they feel safer there",
+            "has memorized every security camera location in a 10-block radius",
+            "keeps detailed notes on everyone they meet in case they need leverage later",
+            "never drives the same car for more than three days",
+            "only wears clothes that can be quickly disposed of",
+            "has a go-bag hidden in seven different locations around the city",
+            "never makes eye contact with police officers, even when innocent",
+            "compulsively lies about everything, even mundane details",
+            "only uses cash and never leaves a paper trail",
+            "has fake IDs for different personalities and backstories",
+            "never sits with their back to a door or window",
+            "compulsively studies escape routes wherever they go",
+            "only communicates through intermediaries to maintain distance",
+            "has a different cover story for every person they meet",
+            "never uses the same method twice for any criminal activity",
+            "compulsively destroys all evidence, even from legal activities",
+            "only trusts family members, and even then has backup plans",
+            "never stays in one city for more than six months",
+            "has elaborate coded systems for everything they write down",
+            "only meets contacts in abandoned buildings or empty lots",
+            "compulsively monitors police scanners and news reports",
+            "never uses electronic payments or leaves digital footprints",
+            "has memorized the schedules of all local law enforcement",
+            "only works during specific hours when they feel safest",
+            "compulsively practices different accents and personas",
+            "never owns anything that can't be quickly liquidated",
+            "has contingency plans for every possible scenario",
+            "only trusts information they've personally verified three times",
+            "compulsively avoids all forms of surveillance technology",
+            "never forms emotional attachments that could be used against them",
+            "has multiple escape routes planned from every location they frequent",
+            "compulsively studies body language to read people's intentions",
+            "never reveals their true criminal specialization to anyone",
+            "only operates in territories they've mapped extensively",
+            "compulsively maintains alibis for times when they're innocent",
+            "never keeps any evidence or trophies from their crimes",
+            "has developed a sixth sense for undercover police officers",
+            "only uses public transportation to avoid vehicle tracking",
+            "compulsively changes their appearance every few months",
+            "never discusses business over phones, even encrypted ones",
+            "has memorized legal statutes to know exactly what they can be charged with"
+        ];
+
+        // Civilian-themed character generation
+        const civilianPrefixes = [
             "Overly enthusiastic", "Burnt-out", "Conspiracy theorist", "Passive-aggressive", "Kleptomaniac", 
             "Narcissistic", "Anxious", "Delusional", "Bitter", "Hypochondriac", "Workaholic", 
             "Vindictive", "Paranoid", "Melodramatic", "Condescending", "Oversharing", 
@@ -268,7 +396,7 @@
             "Thoughtfully considering", "Impulsively deciding", "Wisely choosing", "Foolishly committing"
         ];
 
-        const characterJobs = [
+        const civilianJobs = [
             "televangilist", "yoga instructor", "librarian", "meteorologist", "real estate agent",
             "life coach", "food blogger", "wedding planner", "personal trainer", "fitness influencer",
             "children's party clown", "crossing guard", "Uber driver", "divorce lawyer", "barista",
@@ -397,8 +525,8 @@
             "colon hydrotherapist", "lymphatic drainage specialist", "cupping therapist", "fire cupper"
         ];
 
-        // Complete quirks that make grammatical sense
-        const characterQuirks = [
+        // Complete civilian quirks that make grammatical sense
+        const civilianQuirks = [
             "believes their pet can predict the weather",
             "only eats foods that start with the same letter as the day of the week",
             "compulsively rates everything out of 10, including conversations",
@@ -601,8 +729,10 @@
             "thinks calendars are just fortune telling devices disguised as organizational tools"
         ];
 
-        // Additional character attributes for more depth
-        const physicalTraits = [
+        // Combine all civilian quirks into one comprehensive array
+        const allCivilianQuirks = [
+            ...civilianQuirks,
+            // Physical traits
             "has mismatched earrings", "constantly adjusts their glasses", "always wears the same hat",
             "has a distinctive laugh that echoes", "walks with an unexplained limp", "has three different colored hair ties",
             "constantly fidgets with their watch", "always smells like vanilla", "has a scar shaped like a question mark",
@@ -614,10 +744,8 @@
             "has a habit of tilting their head when confused", "always smells like fresh bread",
             "has hands that are always slightly damp", "walks like they're sneaking everywhere",
             "has a laugh that starts quiet and gets progressively louder", "always wears something purple",
-            "has eyes that water when they're happy", "constantly hums without realizing it"
-        ];
-
-        const backstoryElements = [
+            "has eyes that water when they're happy", "constantly hums without realizing it",
+            // Backstory elements
             "was once featured in a local newspaper for an embarrassing reason",
             "spent a summer working at a defunct theme park", "used to be in a band called 'Existential Crisis'",
             "once got lost in their own neighborhood for 6 hours", "was homeschooled by conspiracy theorist parents",
@@ -633,10 +761,8 @@
             "once spent a year communicating only through haikus", "was homeschooled using only infomercials",
             "spent their youth training to be a professional mime", "once lived next door to a family of circus clowns",
             "was briefly married to someone they met at a bus stop", "used to work nights as a museum security guard",
-            "spent a year trying to prove birds aren't real", "once ran for city council on a platform of mandatory nap time"
-        ];
-
-        const speechPatterns = [
+            "spent a year trying to prove birds aren't real", "once ran for city council on a platform of mandatory nap time",
+            // Speech patterns
             "ends every sentence with 'you know what I mean?'", "speaks only in questions when nervous",
             "randomly inserts the word 'allegedly' into conversations", "always speaks in present tense, even about past events",
             "uses air quotes for every noun", "refers to themselves in the third person when embarrassed",
@@ -653,10 +779,8 @@
             "uses therapeutic language for everyday conversations", "speaks like they're always giving a TED talk",
             "ends conversations with 'keep me posted'", "uses weather metaphors for emotions",
             "speaks in infomercial language when trying to convince people", "always says 'no offense' before offensive statements",
-            "uses sports metaphors for everything, even cooking", "speaks like they're conducting a job interview"
-        ];
-
-        const secretObsessions = [
+            "uses sports metaphors for everything, even cooking", "speaks like they're conducting a job interview",
+            // Secret obsessions
             "collects vintage salt and pepper shakers", "memorizes the birthdays of strangers",
             "keeps a detailed journal of every conversation they overhear", "has strong opinions about the correct way to load dishwashers",
             "secretly writes fan fiction about their coworkers", "practices award acceptance speeches in the mirror",
@@ -676,22 +800,24 @@
 
 
 
-        function generateCharacter() {
-            // Generate character type
-            const prefix = characterPrefixes[Math.floor(Math.random() * characterPrefixes.length)];
-            const job = characterJobs[Math.floor(Math.random() * characterJobs.length)];
-            const characterType = `${prefix} ${job}`;
 
-            // Generate ONE quirk from ALL possible quirk types
-            const allQuirks = [
-                ...characterQuirks,
-                ...physicalTraits,
-                ...backstoryElements,
-                ...speechPatterns,
-                ...secretObsessions
-            ];
+
+        function generateCharacter(type = 'civilian') {
+            let prefix, job, quirk;
             
-            const quirk = allQuirks[Math.floor(Math.random() * allQuirks.length)];
+            if (type === 'criminal') {
+                // Generate criminal character
+                prefix = criminalPrefixes[Math.floor(Math.random() * criminalPrefixes.length)];
+                job = criminalJobs[Math.floor(Math.random() * criminalJobs.length)];
+                quirk = criminalQuirks[Math.floor(Math.random() * criminalQuirks.length)];
+            } else {
+                // Generate civilian character
+                prefix = civilianPrefixes[Math.floor(Math.random() * civilianPrefixes.length)];
+                job = civilianJobs[Math.floor(Math.random() * civilianJobs.length)];
+                quirk = allCivilianQuirks[Math.floor(Math.random() * allCivilianQuirks.length)];
+            }
+            
+            const characterType = `${prefix} ${job}`;
             
             const typeElement = document.querySelector('.character-type');
             const quirkElement = document.querySelector('.character-quirk');
