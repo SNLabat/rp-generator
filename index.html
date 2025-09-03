@@ -203,6 +203,28 @@
             box-shadow: 0 12px 30px rgba(75, 0, 130, 0.4);
         }
 
+        .government-btn {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            border: 2px solid #60a5fa;
+            color: white;
+            padding: 18px 36px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px;
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .government-btn:hover {
+            background: linear-gradient(45deg, #1d4ed8, #2563eb);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(30, 64, 175, 0.4);
+        }
+
         .placeholder-text {
             color: #666;
             font-size: 1.1rem;
@@ -246,6 +268,7 @@
         <div class="button-container">
             <button class="generate-btn criminal-btn" onclick="generateCharacter('criminal')">Criminal</button>
             <button class="generate-btn civilian-btn" onclick="generateCharacter('civilian')">Civilian</button>
+            <button class="generate-btn government-btn" onclick="generateCharacter('government')">Government Worker</button>
             <button class="generate-btn crime-btn" onclick="generateCrime()">Crime Generator (In Beta)</button>
         </div>
     </div>
@@ -1549,9 +1572,239 @@
             "During a debate about the correct way to pronounce 'gif'"
         ];
 
+        // Government Worker character generation
+        const governmentPrefixes = [
+            "Bureaucratic", "Overworked", "Underpaid", "Pension-obsessed", "Red-tape-loving", "Protocol-following",
+            "Regulation-enforcing", "Form-requiring", "Committee-forming", "Meeting-scheduling", "Procedure-following",
+            "Hierarchy-respecting", "Chain-of-command-following", "Policy-implementing", "Compliance-ensuring",
+            "Audit-fearing", "Inspection-dreading", "Review-preparing", "Documentation-obsessed", "Filing-compulsive",
+            "Deadline-missing", "Budget-cutting", "Cost-saving", "Efficiency-lacking", "Process-improving",
+            "Union-representing", "Grievance-filing", "Seniority-claiming", "Tenure-protecting", "Benefits-maximizing",
+            "Sick-leave-using", "Vacation-hoarding", "Overtime-avoiding", "Lunch-break-extending", "Coffee-break-taking",
+            "Retirement-counting", "Years-of-service-bragging", "Pension-calculating", "Health-insurance-using",
+            "Dental-coverage-maximizing", "Vision-benefits-claiming", "Flex-spending-optimizing", "401k-contributing",
+            "Whistleblowing", "Ethics-reporting", "Fraud-investigating", "Corruption-exposing", "Transparency-advocating",
+            "Public-service-dedicated", "Taxpayer-serving", "Community-focused", "Citizen-helping", "Democracy-supporting",
+            "Constitution-defending", "Rights-protecting", "Justice-seeking", "Law-enforcing", "Order-maintaining",
+            "Safety-ensuring", "Security-providing", "Emergency-responding", "Crisis-managing", "Disaster-preparing",
+            "Information-disseminating", "Education-providing", "Training-conducting", "Certification-issuing", "License-granting",
+            "Permit-processing", "Application-reviewing", "Inspection-conducting", "Violation-citing", "Fine-issuing",
+            "Court-appearing", "Testimony-giving", "Evidence-collecting", "Investigation-conducting", "Report-writing",
+            "Data-analyzing", "Statistics-compiling", "Research-conducting", "Study-performing", "Survey-administering",
+            "Program-managing", "Project-coordinating", "Initiative-leading", "Task-force-joining", "Committee-serving",
+            "Board-attending", "Council-participating", "Commission-serving", "Panel-judging", "Review-conducting",
+            "Interagency-coordinating", "Cross-departmental-collaborating", "Multi-jurisdictional-working", "Federal-state-liaising",
+            "Public-private-partnering", "Stakeholder-engaging", "Community-outreaching", "Public-meeting-hosting",
+            "Town-hall-organizing", "Forum-moderating", "Feedback-collecting", "Comment-period-managing",
+            "Rulemaking-participating", "Regulation-drafting", "Policy-developing", "Legislation-supporting",
+            "Amendment-proposing", "Bill-analyzing", "Law-interpreting", "Statute-implementing", "Ordinance-enforcing",
+            "Code-updating", "Standard-setting", "Guideline-establishing", "Best-practice-developing", "Framework-creating",
+            "System-modernizing", "Technology-upgrading", "Digital-transforming", "Automation-implementing", "AI-integrating",
+            "Cybersecurity-maintaining", "Data-protecting", "Privacy-ensuring", "Transparency-balancing", "Access-controlling",
+            "Records-managing", "Archive-maintaining", "History-preserving", "Legacy-system-supporting", "Migration-planning",
+            "Backup-maintaining", "Recovery-planning", "Continuity-ensuring", "Resilience-building", "Redundancy-creating",
+            "Quality-assuring", "Performance-measuring", "Outcome-evaluating", "Impact-assessing", "Effectiveness-analyzing",
+            "Efficiency-improving", "Cost-benefit-analyzing", "Resource-allocating", "Priority-setting", "Strategy-developing",
+            "Vision-articulating", "Mission-fulfilling", "Value-demonstrating", "Purpose-serving", "Goal-achieving"
+        ];
 
+        const governmentJobs = [
+            // Federal Agencies
+            "IRS tax auditor", "FBI special agent", "CIA intelligence analyst", "NSA cryptographer", "Secret Service agent",
+            "DEA special agent", "ATF firearms inspector", "Border Patrol agent", "Customs officer", "Immigration officer",
+            "TSA security screener", "Air Marshal", "Coast Guard officer", "Park Ranger", "Forest Service firefighter",
+            "USPS mail carrier", "Social Security claims specialist", "Medicare fraud investigator", "Veterans Affairs counselor",
+            "FEMA disaster coordinator", "EPA environmental inspector", "FDA food safety inspector", "OSHA safety inspector",
+            "Census Bureau enumerator", "Bureau of Labor Statistics economist", "Weather Service meteorologist",
+            "Geological Survey seismologist", "NASA mission specialist", "Department of Energy physicist",
+            "Department of Agriculture inspector", "Fish and Wildlife Service biologist", "Smithsonian curator",
+            "Library of Congress archivist", "Government Accountability Office auditor", "Congressional Budget Office analyst",
+            
+            // State Government
+            "DMV license examiner", "State tax collector", "Highway patrol officer", "State trooper", "Motor vehicle inspector",
+            "Unemployment benefits processor", "Workers' compensation adjuster", "State park superintendent",
+            "Public utilities commissioner", "State lottery official", "Gaming commission investigator",
+            "Professional licensing board member", "State health inspector", "Environmental protection specialist",
+            "Economic development coordinator", "Tourism promotion specialist", "Emergency management director",
+            "State auditor", "Budget analyst", "Legislative aide", "Governor's office liaison",
+            "Attorney General investigator", "Public defender", "State prosecutor", "Court administrator",
+            "Probation officer", "Parole officer", "Corrections officer", "Prison warden", "Juvenile detention counselor",
+            
+            // Local Government
+            "City council member", "Mayor's chief of staff", "City manager", "Municipal clerk", "Zoning board member",
+            "Building permit processor", "Code enforcement officer", "Health department inspector", "Animal control officer",
+            "Public works director", "Water department technician", "Sewer maintenance worker", "Garbage collection supervisor",
+            "Recycling program coordinator", "Public transportation planner", "Traffic signal technician", "Parking enforcement officer",
+            "Meter reader", "Property tax assessor", "Election official", "Polling place coordinator", "Voter registration clerk",
+            "Public information officer", "Community outreach coordinator", "Senior services coordinator", "Youth program director",
+            "Recreation center manager", "Public pool lifeguard", "Library branch manager", "Museum education coordinator",
+            "Historic preservation specialist", "Tourism bureau representative", "Economic development planner",
+            "Emergency services dispatcher", "Fire department inspector", "Police records clerk", "Evidence technician",
+            "Crime scene investigator", "Forensic analyst", "Court reporter", "Bailiff", "Public defender investigator",
+            
+            // Specialized Government Roles
+            "Congressional intern", "Policy research analyst", "Legislative counsel", "Regulatory affairs specialist",
+            "Government relations coordinator", "Public affairs officer", "Press secretary", "Communications director",
+            "Strategic planning consultant", "Performance measurement analyst", "Budget examiner", "Financial analyst",
+            "Procurement specialist", "Contract administrator", "Grant writer", "Grant program manager",
+            "Compliance officer", "Internal auditor", "Risk management specialist", "Quality assurance coordinator",
+            "Training and development specialist", "Human resources generalist", "Equal opportunity specialist",
+            "Ethics officer", "Ombudsman", "Inspector General investigator", "Fraud examiner", "Background investigator",
+            "Security clearance processor", "Facility security officer", "Information systems security manager",
+            "Records management specialist", "Freedom of Information Act coordinator", "Privacy officer", "Data analyst",
+            "Geographic information systems specialist", "Database administrator", "Network administrator", "Help desk technician",
+            "Web developer", "Social media coordinator", "Digital services manager", "Customer service representative",
+            
+            // Public Service & Community
+            "Social worker", "Case manager", "Family services coordinator", "Child protective services investigator",
+            "Adult protective services worker", "Mental health counselor", "Substance abuse counselor", "Homeless services coordinator",
+            "Housing assistance specialist", "Food assistance program coordinator", "WIC nutrition educator",
+            "Public health nurse", "Community health worker", "Epidemiologist", "Disease surveillance specialist",
+            "Environmental health specialist", "Vector control specialist", "Water quality tester", "Air quality monitor",
+            "Radiation safety officer", "Hazardous materials coordinator", "Emergency preparedness planner",
+            "Public safety communications operator", "Emergency medical services coordinator", "Fire prevention educator",
+            "Community policing officer", "School resource officer", "Traffic safety educator", "Victim services advocate",
+            
+            // Education & Public Information
+            "Public school superintendent", "School district administrator", "Curriculum specialist", "Special education coordinator",
+            "School nutrition director", "Transportation coordinator", "Facilities manager", "Technology coordinator",
+            "Public library director", "Information literacy specialist", "Digital archives coordinator", "Research librarian",
+            "Public access television coordinator", "Government channel producer", "Public meeting videographer",
+            "Translation services coordinator", "Language access specialist", "Disability services coordinator",
+            "Senior citizen services director", "Veterans services officer", "Military family liaison",
+            
+            // Infrastructure & Utilities
+            "Public works engineer", "Traffic engineer", "Transportation planner", "Infrastructure maintenance supervisor",
+            "Bridge inspector", "Road maintenance crew chief", "Snow removal coordinator", "Street sweeping supervisor",
+            "Public lighting technician", "Sidewalk repair specialist", "Storm drain maintenance worker",
+            "Water treatment plant operator", "Wastewater treatment specialist", "Water quality laboratory technician",
+            "Utility meter reader", "Power grid maintenance technician", "Telecommunications coordinator",
+            "Public Wi-Fi network administrator", "Smart city technology coordinator", "Traffic signal synchronization specialist",
+            
+            // Regulatory & Oversight
+            "Business license examiner", "Professional license investigator", "Consumer protection specialist",
+            "Weights and measures inspector", "Elevator safety inspector", "Boiler inspector", "Fire safety inspector",
+            "Restaurant health inspector", "Hotel inspection coordinator", "Child care facility inspector",
+            "Nursing home quality assurance specialist", "Hospital accreditation reviewer", "Medical facility inspector",
+            "Pharmacy board investigator", "Controlled substance registrar", "Medical waste compliance officer",
+            "Environmental permit reviewer", "Air quality compliance specialist", "Water discharge permit coordinator",
+            "Hazardous waste facility inspector", "Nuclear safety inspector", "Occupational safety investigator"
+        ];
 
-
+        const governmentQuirks = [
+            "believes every citizen is secretly plotting tax evasion",
+            "compulsively quotes federal regulations in casual conversation",
+            "only trusts information that comes in triplicate",
+            "thinks all meetings could be solved with a proper flowchart",
+            "believes their desk drawer organization system could revolutionize democracy",
+            "compulsively corrects people about proper flag etiquette",
+            "only makes decisions after consulting at least three different policy manuals",
+            "believes their government ID badge gives them superpowers",
+            "thinks all problems can be solved with the right committee formation",
+            "compulsively files incident reports for minor social interactions",
+            "only communicates through official memorandums, even with family",
+            "believes their pension fund is personally managed by the President",
+            "thinks every phone call might be monitored by their own department",
+            "compulsively practices their testimony for congressional hearings they'll never attend",
+            "only trusts restaurants that pass government health inspections with perfect scores",
+            "believes their lunch break timing affects national security",
+            "compulsively organizes everything according to federal filing systems",
+            "thinks their employee handbook contains the secrets to life",
+            "only wears clothing that meets government dress code standards, even on weekends",
+            "believes their cubicle is strategically positioned for optimal democracy",
+            "compulsively calculates their retirement benefits during every conversation",
+            "thinks all civilians are secretly impressed by their government employment",
+            "only makes purchases that could be justified in a budget hearing",
+            "believes their work computer is connected to a secret government network",
+            "compulsively explains the proper procedure for everything",
+            "thinks their government parking pass is a symbol of ultimate authority",
+            "only trusts news sources that cite government statistics",
+            "believes their security clearance level determines their worth as a person",
+            "compulsively practices saying 'I cannot comment on ongoing investigations'",
+            "thinks their office supplies are strategically rationed by national policy",
+            "only schedules personal appointments during approved government break times",
+            "believes their time clock punches are being analyzed for patterns by AI",
+            "compulsively explains why certain forms require specific ink colors",
+            "thinks their government health insurance makes them medically invincible",
+            "only trusts elevators in government buildings because of superior safety standards",
+            "believes their union representative has direct access to the President",
+            "compulsively practices different ways to say 'that's above my pay grade'",
+            "thinks their employee ID number contains hidden meaning about their destiny",
+            "only eats lunch at government-approved time intervals",
+            "believes their office thermostat setting affects national productivity",
+            "compulsively memorizes emergency evacuation procedures for buildings they visit once",
+            "thinks their government email signature is their personal brand statement",
+            "only trusts weather forecasts issued by government meteorologists",
+            "believes their sick leave usage is being tracked by multiple agencies",
+            "compulsively explains the difference between federal, state, and local jurisdiction",
+            "thinks their performance review scores are secretly shared with other agencies",
+            "only makes photocopies on government-approved paper to ensure document integrity",
+            "believes their office coffee fund is subject to federal oversight",
+            "compulsively practices explaining government acronyms to confused civilians",
+            "thinks their parking spot assignment reflects their true government importance",
+            "only trusts pens that meet federal writing instrument specifications",
+            "believes their lunch choices are being analyzed for security clearance purposes",
+            "compulsively calculates how their daily tasks impact the national deficit",
+            "thinks their cubicle decorations require approval from the facilities management committee",
+            "only schedules meetings in 15-minute increments to maximize government efficiency",
+            "believes their computer password complexity helps protect national secrets",
+            "compulsively explains why certain documents require specific signatures",
+            "thinks their government vehicle mileage log is being audited by the Treasury Department",
+            "only trusts information that has been properly classified and declassified",
+            "believes their office recycling habits affect federal environmental policy",
+            "compulsively practices different ways to say 'that's not in my job description'",
+            "thinks their government-issued calculator is more accurate than civilian models",
+            "only takes bathroom breaks during federally mandated rest periods",
+            "believes their office plant care routine affects government building morale statistics",
+            "compulsively explains why government cheese is superior to commercial cheese",
+            "thinks their stapler usage is being monitored for office supply fraud prevention",
+            "only trusts clocks that are synchronized with the National Institute of Standards and Technology",
+            "believes their lunch bag searches are practice for national security protocols",
+            "compulsively organizes their desk according to Homeland Security guidelines",
+            "thinks their government-issued mouse pad contains classified technology",
+            "only makes personal phone calls after verifying they won't violate ethics rules",
+            "believes their office chair height adjustment affects their security clearance level",
+            "compulsively explains the proper protocol for reporting suspicious office behavior",
+            "thinks their government health screening results are shared with intelligence agencies",
+            "only uses elevators after confirming they meet federal accessibility standards",
+            "believes their office holiday party planning requires congressional oversight",
+            "compulsively practices different ways to redirect citizens to the appropriate department",
+            "thinks their government training certificates qualify them to solve any civilian problem",
+            "only trusts maps produced by government cartography departments",
+            "believes their office emergency supplies are strategically positioned for national defense",
+            "compulsively explains why government forms cannot be simplified without congressional action",
+            "thinks their employee satisfaction survey responses directly influence federal policy",
+            "only eats government-subsidized cafeteria food because it's patriotic",
+            "believes their office building's architectural design contains hidden security features",
+            "compulsively memorizes government phone directory extensions for emergency situations",
+            "thinks their government email account is more secure than Fort Knox",
+            "only trusts weather apps that source data from the National Weather Service",
+            "believes their office supply requests are reviewed by a secret efficiency task force",
+            "compulsively explains the historical significance of government building room numbers",
+            "thinks their government-issued laptop contains special democracy-enhancing software",
+            "only schedules personal appointments around government holiday calendars",
+            "believes their office water cooler conversations are informally monitored for morale assessment",
+            "compulsively practices explaining why government processes take exactly as long as they should",
+            "thinks their government parking validation stamps have special anti-counterfeiting features",
+            "only trusts public transportation schedules published by government transit authorities",
+            "believes their office key card access logs are analyzed for optimal workflow patterns",
+            "compulsively explains why certain government decisions require exactly 47 approvals",
+            "thinks their government health insurance card doubles as a national security credential",
+            "only makes copies using government photocopiers because they're calibrated for official documents",
+            "believes their office fire drill participation scores affect their annual performance rating",
+            "compulsively organizes personal files using the same system as classified government documents",
+            "thinks their government-issued pen writes with special democracy-infused ink",
+            "only trusts calendars that include all federal holidays and observances",
+            "believes their office plant watering schedule is coordinated with agricultural department policies",
+            "compulsively explains why government bathroom paper towel dispensers are designed for optimal efficiency",
+            "thinks their employee badge photo was taken by the same photographer who does passport photos",
+            "only eats lunch at times that don't conflict with government meal period regulations",
+            "believes their office thermostat is connected to a national energy grid monitoring system",
+            "compulsively practices explaining government acronyms in alphabetical order",
+            "thinks their government email auto-reply messages are reviewed by communications specialists",
+            "only trusts elevators that display current government safety inspection certificates",
+            "believes their office supply closet inventory is tracked by the General Services Administration"
+        ];
 
         function generateCharacter(type = 'civilian') {
             let prefix, job, quirk;
@@ -1561,6 +1814,11 @@
                 prefix = criminalPrefixes[Math.floor(Math.random() * criminalPrefixes.length)];
                 job = criminalJobs[Math.floor(Math.random() * criminalJobs.length)];
                 quirk = criminalQuirks[Math.floor(Math.random() * criminalQuirks.length)];
+            } else if (type === 'government') {
+                // Generate government worker character
+                prefix = governmentPrefixes[Math.floor(Math.random() * governmentPrefixes.length)];
+                job = governmentJobs[Math.floor(Math.random() * governmentJobs.length)];
+                quirk = governmentQuirks[Math.floor(Math.random() * governmentQuirks.length)];
             } else {
                 // Generate civilian character
                 prefix = civilianPrefixes[Math.floor(Math.random() * civilianPrefixes.length)];
