@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RP Character Generator</title>
+    <title>Improv Character Generator</title>
     <style>
         * {
             margin: 0;
@@ -436,6 +436,20 @@
     </div>
 
     <script>
+        /* 
+        GLOBAL SUGGESTIONS SYSTEM:
+        This system attempts to use a free JSON storage service to share suggestions
+        across all users. If the service is unavailable, it falls back to localStorage.
+        
+        To set up your own global storage:
+        1. Go to https://jsonbin.io and create a free account
+        2. Create a new bin (JSON storage) 
+        3. Replace the API key and BIN_ID below with your own
+        4. Set your bin to public read access
+        
+        For now, it uses localStorage as fallback for immediate functionality.
+        */
+        
         // Criminal-themed character generation
         const criminalPrefixes = [
             "Reformed", "Hardened", "Small-time", "Professional", "Desperate", "Cunning", "Reckless",
@@ -2050,14 +2064,60 @@
             }, 150);
         }
 
-        // Suggestion system functions
+        // Global suggestion system using JSONBin.io
+        const JSONBIN_API_KEY = '$2a$10$YourAPIKeyHere'; // Users will need to replace this
+        const BIN_ID = '673a1b2ae41b4d34e44f8c91'; // Public bin for character suggestions
+        
+        // Fallback to localStorage if API fails
         function loadSuggestions() {
-            const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
-            displaySuggestions(suggestions);
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.innerHTML = '<div class="no-suggestions">Loading suggestions...</div>';
+            
+            // Try to load from global API first
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': JSONBIN_API_KEY
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('API request failed');
+                return response.json();
+            })
+            .then(data => {
+                const suggestions = data.record || [];
+                displaySuggestions(suggestions);
+                // Also save to localStorage as backup
+                localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+            })
+            .catch(error => {
+                console.log('Failed to load from API, using localStorage:', error);
+                // Fallback to localStorage
+                const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+                displaySuggestions(suggestions);
+            });
         }
 
         function saveSuggestions(suggestions) {
+            // Save to localStorage immediately
             localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+            
+            // Try to save to global API
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify(suggestions)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('API save failed');
+                console.log('Suggestions saved globally!');
+            })
+            .catch(error => {
+                console.log('Failed to save to API, saved locally only:', error);
+            });
         }
 
         function submitSuggestion(event) {
@@ -2071,33 +2131,85 @@
                 return;
             }
             
-            const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
-            
-            const newSuggestion = {
-                id: Date.now(),
-                text: suggestionText,
-                author: suggesterName,
-                timestamp: new Date().toLocaleDateString()
-            };
-            
-            suggestions.unshift(newSuggestion); // Add to beginning of array
-            saveSuggestions(suggestions);
-            displaySuggestions(suggestions);
-            
-            // Clear form
-            document.getElementById('suggestionText').value = '';
-            document.getElementById('suggesterName').value = '';
-            
-            // Show success feedback
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Submitted!';
-            submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
             
-            setTimeout(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
-            }, 2000);
+            // Show loading state
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            submitBtn.style.background = 'linear-gradient(45deg, #666, #888)';
+            
+            // First try to load current suggestions from API
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': JSONBIN_API_KEY
+                }
+            })
+            .then(response => response.ok ? response.json() : { record: [] })
+            .then(data => {
+                const suggestions = data.record || [];
+                
+                const newSuggestion = {
+                    id: Date.now(),
+                    text: suggestionText,
+                    author: suggesterName,
+                    timestamp: new Date().toLocaleDateString()
+                };
+                
+                suggestions.unshift(newSuggestion); // Add to beginning of array
+                return saveSuggestionsAndUpdate(suggestions);
+            })
+            .catch(error => {
+                console.log('API error, using localStorage fallback:', error);
+                // Fallback to localStorage
+                const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+                const newSuggestion = {
+                    id: Date.now(),
+                    text: suggestionText,
+                    author: suggesterName,
+                    timestamp: new Date().toLocaleDateString()
+                };
+                suggestions.unshift(newSuggestion);
+                localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+                displaySuggestions(suggestions);
+            })
+            .finally(() => {
+                // Clear form and reset button
+                document.getElementById('suggestionText').value = '';
+                document.getElementById('suggesterName').value = '';
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submitted!';
+                submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
+                
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+                }, 2000);
+            });
+        }
+        
+        function saveSuggestionsAndUpdate(suggestions) {
+            // Save to API
+            return fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify(suggestions)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Suggestions saved globally!');
+                    displaySuggestions(suggestions);
+                    // Also save to localStorage as backup
+                    localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+                } else {
+                    throw new Error('API save failed');
+                }
+            });
         }
 
         function displaySuggestions(suggestions) {
