@@ -2064,73 +2064,44 @@
         const JSONBIN_CONFIG = {
             masterKey: '$2a$10$6CbUHTJMRNh31QiQbGPikOXhyKiUpWnowHGY0bBd5ThT9Wn/y/82a',
             accessKey: '$2a$10$HTbmmZMGrmFHwBkc42vBfOrYTAaj.nIz4Z0.92zeKZP8bkYZL5NX6',
-            binId: null, // Will be set after first creation
+            // Use a fixed bin name for cross-device sharing
+            binName: 'character-suggestions-shared',
+            binId: null, // Will be discovered or created
             apiUrl: 'https://api.jsonbin.io/v3'
         };
 
-        // Get or create bin ID from localStorage
-        function getBinId() {
-            let binId = localStorage.getItem('jsonbin_suggestions_id');
-            if (!binId) {
-                // We'll create a new bin on first save
-                return null;
-            }
-            return binId;
-        }
-
-        function setBinId(binId) {
-            localStorage.setItem('jsonbin_suggestions_id', binId);
-            JSONBIN_CONFIG.binId = binId;
-        }
-        
-        function loadSuggestions() {
-            const suggestionsList = document.getElementById('suggestionsList');
-            suggestionsList.innerHTML = '<div class="no-suggestions">Loading suggestions...</div>';
-            
-            const binId = getBinId();
-            
-            if (!binId) {
-                // No bin exists yet, use starter suggestions
-                console.log('No JSONBin.io bin found, using starter suggestions');
-                loadStarterSuggestions();
-                return;
-            }
-            
-            // Load from JSONBin.io
-            fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}/latest`, {
-                method: 'GET',
-                headers: {
-                    'X-Master-Key': JSONBIN_CONFIG.masterKey
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error(`JSONBin.io error: ${response.status}`);
-                }
-            })
-            .then(data => {
-                const suggestions = data.record || [];
-                displaySuggestions(suggestions);
-                // Also save to localStorage as backup
-                localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
-            })
-            .catch(error => {
-                console.log('Could not load from JSONBin.io, using localStorage fallback:', error);
-                // Fallback to localStorage
-                let suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+        // Get shared bin ID - first try to find existing bin by name
+        async function getOrCreateSharedBin() {
+            // First, try to find existing bin by name
+            try {
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/c/bins`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    }
+                });
                 
-                if (suggestions.length === 0) {
-                    loadStarterSuggestions();
-                } else {
-                    displaySuggestions(suggestions);
+                if (response.ok) {
+                    const data = await response.json();
+                    const existingBin = data.find(bin => bin.name === JSONBIN_CONFIG.binName);
+                    
+                    if (existingBin) {
+                        JSONBIN_CONFIG.binId = existingBin.id;
+                        localStorage.setItem('jsonbin_suggestions_id', existingBin.id);
+                        console.log('📍 Found existing shared bin:', existingBin.id);
+                        return existingBin.id;
+                    }
                 }
-            });
+            } catch (error) {
+                console.log('Could not list bins, will try to create new one:', error);
+            }
+            
+            // If no existing bin found, create a new one
+            return await createSharedBin();
         }
 
-        function loadStarterSuggestions() {
-            const suggestions = [
+        async function createSharedBin() {
+            const starterSuggestions = [
                 {
                     id: Date.now(),
                     text: "Overly enthusiastic DMV employee",
@@ -2144,75 +2115,130 @@
                     timestamp: new Date().toLocaleDateString()
                 }
             ];
-            
-            displaySuggestions(suggestions);
-            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
-            // Save starter suggestions to JSONBin.io
-            saveSuggestionsToCloud(suggestions);
+
+            try {
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/b`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey,
+                        'X-Bin-Name': JSONBIN_CONFIG.binName
+                    },
+                    body: JSON.stringify(starterSuggestions)
+                });
+
+                const data = await response.json();
+                
+                if (data.metadata && data.metadata.id) {
+                    JSONBIN_CONFIG.binId = data.metadata.id;
+                    localStorage.setItem('jsonbin_suggestions_id', data.metadata.id);
+                    console.log('✅ Created new shared bin:', data.metadata.id);
+                    return data.metadata.id;
+                } else {
+                    throw new Error('Failed to create shared bin');
+                }
+            } catch (error) {
+                console.error('❌ Failed to create shared bin:', error);
+                return null;
+            }
         }
-
-
-        function saveSuggestionsToCloud(suggestions) {
-            // Save to localStorage immediately as backup
-            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+        
+        async function loadSuggestions() {
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.innerHTML = '<div class="no-suggestions">Loading suggestions...</div>';
             
-            const binId = getBinId();
-            
-            if (!binId) {
-                // Create new bin
-                createNewBin(suggestions);
-            } else {
-                // Update existing bin
-                updateBin(binId, suggestions);
+            try {
+                // Get or create the shared bin
+                const binId = await getOrCreateSharedBin();
+                
+                if (!binId) {
+                    throw new Error('Could not get or create shared bin');
+                }
+                
+                // Load from JSONBin.io
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const suggestions = data.record || [];
+                    displaySuggestions(suggestions);
+                    // Also save to localStorage as backup
+                    localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+                    console.log('✅ Loaded', suggestions.length, 'suggestions from cloud');
+                } else {
+                    throw new Error(`JSONBin.io error: ${response.status}`);
+                }
+            } catch (error) {
+                console.log('Could not load from JSONBin.io, using localStorage fallback:', error);
+                // Fallback to localStorage
+                let suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+                
+                if (suggestions.length === 0) {
+                    // Create starter suggestions and try to save to cloud
+                    suggestions = [
+                        {
+                            id: Date.now(),
+                            text: "Overly enthusiastic DMV employee",
+                            author: "Website Creator", 
+                            timestamp: new Date().toLocaleDateString()
+                        },
+                        {
+                            id: Date.now() + 1,
+                            text: "Paranoid food truck owner who thinks pigeons are government spies",
+                            author: "Demo User",
+                            timestamp: new Date().toLocaleDateString()
+                        }
+                    ];
+                    localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+                    
+                    // Try to save starter suggestions to cloud
+                    saveSuggestionsToCloud(suggestions);
+                }
+                
+                displaySuggestions(suggestions);
             }
         }
 
-        function createNewBin(suggestions) {
-            fetch(`${JSONBIN_CONFIG.apiUrl}/b`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_CONFIG.masterKey,
-                    'X-Bin-Name': 'character-suggestions'
-                },
-                body: JSON.stringify(suggestions)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.metadata && data.metadata.id) {
-                    setBinId(data.metadata.id);
-                    console.log('✅ Created new JSONBin.io storage for suggestions');
-                } else {
-                    throw new Error('Failed to create bin');
-                }
-            })
-            .catch(error => {
-                console.error('❌ Failed to create JSONBin.io storage:', error);
-                console.log('💾 Suggestions saved locally only');
-            });
-        }
 
-        function updateBin(binId, suggestions) {
-            fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_CONFIG.masterKey
-                },
-                body: JSON.stringify(suggestions)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.metadata) {
-                    console.log('✅ Suggestions synced to cloud storage');
-                } else {
-                    throw new Error('Failed to update bin');
+
+        async function saveSuggestionsToCloud(suggestions) {
+            // Save to localStorage immediately as backup
+            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+            
+            try {
+                // Get or create the shared bin
+                const binId = await getOrCreateSharedBin();
+                
+                if (!binId) {
+                    throw new Error('Could not get or create shared bin');
                 }
-            })
-            .catch(error => {
+                
+                // Update the shared bin
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    },
+                    body: JSON.stringify(suggestions)
+                });
+                
+                const data = await response.json();
+                
+                if (data.metadata) {
+                    console.log('✅ Suggestions synced to shared cloud storage');
+                } else {
+                    throw new Error('Failed to update shared bin');
+                }
+            } catch (error) {
                 console.error('❌ Failed to sync to JSONBin.io:', error);
                 console.log('💾 Suggestions saved locally only');
-            });
+            }
         }
 
         function saveSuggestions(suggestions) {
@@ -2228,7 +2254,7 @@
         // Expose sync function globally for debugging
         window.forceSyncFromCloud = forceSyncFromCloud;
 
-        function submitSuggestion(event) {
+        async function submitSuggestion(event) {
             event.preventDefault();
             
             const suggestionText = document.getElementById('suggestionText').value.trim();
@@ -2262,16 +2288,24 @@
             // Display immediately for better UX
             displaySuggestions(suggestions);
             
-            // Save to cloud storage
-            saveSuggestionsToCloud(suggestions);
+            try {
+                // Save to cloud storage and wait for completion
+                await saveSuggestionsToCloud(suggestions);
+                
+                // Success feedback
+                submitBtn.textContent = 'Saved to Cloud!';
+                submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
+            } catch (error) {
+                // Error feedback
+                submitBtn.textContent = 'Saved Locally';
+                submitBtn.style.background = 'linear-gradient(45deg, #ffaa44, #ff8844)';
+                console.error('Submission saved locally but failed to sync to cloud:', error);
+            }
             
             // Clear form and reset button
             document.getElementById('suggestionText').value = '';
             document.getElementById('suggesterName').value = '';
-            
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Saved to Cloud!';
-            submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
             
             setTimeout(() => {
                 submitBtn.textContent = originalText;
