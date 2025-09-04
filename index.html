@@ -2057,61 +2057,176 @@
             }, 150);
         }
 
-        // Global suggestion system using KV storage (no API key required)
-        const STORAGE_URL = 'https://kvdb.io/HkzBzYzYpMxVDFQJAhCfyD/character-suggestions';
+        // JSONBIN.IO CLOUD STORAGE SYSTEM
+        // Stores and loads suggestions using JSONBin.io API
+        
+        // JSONBin.io Configuration
+        const JSONBIN_CONFIG = {
+            masterKey: '$2a$10$6CbUHTJMRNh31QiQbGPikOXhyKiUpWnowHGY0bBd5ThT9Wn/y/82a',
+            accessKey: '$2a$10$HTbmmZMGrmFHwBkc42vBfOrYTAaj.nIz4Z0.92zeKZP8bkYZL5NX6',
+            binId: null, // Will be set after first creation
+            apiUrl: 'https://api.jsonbin.io/v3'
+        };
+
+        // Get or create bin ID from localStorage
+        function getBinId() {
+            let binId = localStorage.getItem('jsonbin_suggestions_id');
+            if (!binId) {
+                // We'll create a new bin on first save
+                return null;
+            }
+            return binId;
+        }
+
+        function setBinId(binId) {
+            localStorage.setItem('jsonbin_suggestions_id', binId);
+            JSONBIN_CONFIG.binId = binId;
+        }
         
         function loadSuggestions() {
             const suggestionsList = document.getElementById('suggestionsList');
             suggestionsList.innerHTML = '<div class="no-suggestions">Loading suggestions...</div>';
             
-            // Try to load from global storage first
-            fetch(STORAGE_URL)
+            const binId = getBinId();
+            
+            if (!binId) {
+                // No bin exists yet, use starter suggestions
+                console.log('No JSONBin.io bin found, using starter suggestions');
+                loadStarterSuggestions();
+                return;
+            }
+            
+            // Load from JSONBin.io
+            fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': JSONBIN_CONFIG.masterKey
+                }
+            })
             .then(response => {
                 if (response.ok) {
                     return response.json();
-                } else if (response.status === 404) {
-                    // No data exists yet, return empty array
-                    return [];
                 } else {
-                    throw new Error('API request failed');
+                    throw new Error(`JSONBin.io error: ${response.status}`);
                 }
             })
-            .then(suggestions => {
+            .then(data => {
+                const suggestions = data.record || [];
                 displaySuggestions(suggestions);
                 // Also save to localStorage as backup
                 localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
             })
             .catch(error => {
-                console.log('Failed to load from global storage, using localStorage:', error);
+                console.log('Could not load from JSONBin.io, using localStorage fallback:', error);
                 // Fallback to localStorage
-                const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
-                displaySuggestions(suggestions);
+                let suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+                
+                if (suggestions.length === 0) {
+                    loadStarterSuggestions();
+                } else {
+                    displaySuggestions(suggestions);
+                }
+            });
+        }
+
+        function loadStarterSuggestions() {
+            const suggestions = [
+                {
+                    id: Date.now(),
+                    text: "Overly enthusiastic DMV employee",
+                    author: "Website Creator", 
+                    timestamp: new Date().toLocaleDateString()
+                },
+                {
+                    id: Date.now() + 1,
+                    text: "Paranoid food truck owner who thinks pigeons are government spies",
+                    author: "Demo User",
+                    timestamp: new Date().toLocaleDateString()
+                }
+            ];
+            
+            displaySuggestions(suggestions);
+            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+            // Save starter suggestions to JSONBin.io
+            saveSuggestionsToCloud(suggestions);
+        }
+
+
+        function saveSuggestionsToCloud(suggestions) {
+            // Save to localStorage immediately as backup
+            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
+            
+            const binId = getBinId();
+            
+            if (!binId) {
+                // Create new bin
+                createNewBin(suggestions);
+            } else {
+                // Update existing bin
+                updateBin(binId, suggestions);
+            }
+        }
+
+        function createNewBin(suggestions) {
+            fetch(`${JSONBIN_CONFIG.apiUrl}/b`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_CONFIG.masterKey,
+                    'X-Bin-Name': 'character-suggestions'
+                },
+                body: JSON.stringify(suggestions)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.metadata && data.metadata.id) {
+                    setBinId(data.metadata.id);
+                    console.log('✅ Created new JSONBin.io storage for suggestions');
+                } else {
+                    throw new Error('Failed to create bin');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Failed to create JSONBin.io storage:', error);
+                console.log('💾 Suggestions saved locally only');
+            });
+        }
+
+        function updateBin(binId, suggestions) {
+            fetch(`${JSONBIN_CONFIG.apiUrl}/b/${binId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_CONFIG.masterKey
+                },
+                body: JSON.stringify(suggestions)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.metadata) {
+                    console.log('✅ Suggestions synced to cloud storage');
+                } else {
+                    throw new Error('Failed to update bin');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Failed to sync to JSONBin.io:', error);
+                console.log('💾 Suggestions saved locally only');
             });
         }
 
         function saveSuggestions(suggestions) {
-            // Save to localStorage immediately for instant feedback
-            localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
-            
-            // Save to global storage
-            fetch(STORAGE_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(suggestions)
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Suggestions saved globally! Will sync across all devices.');
-                } else {
-                    throw new Error('Global save failed');
-                }
-            })
-            .catch(error => {
-                console.log('Failed to save globally, saved locally only:', error);
-            });
+            saveSuggestionsToCloud(suggestions);
         }
+
+        // Manual sync function for debugging or forcing refresh
+        function forceSyncFromCloud() {
+            console.log('🔄 Forcing sync from JSONBin.io...');
+            loadSuggestions();
+        }
+
+        // Expose sync function globally for debugging
+        window.forceSyncFromCloud = forceSyncFromCloud;
 
         function submitSuggestion(event) {
             event.preventDefault();
@@ -2128,61 +2243,40 @@
             const originalText = submitBtn.textContent;
             
             // Show loading state
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = 'Saving to cloud...';
             submitBtn.disabled = true;
             submitBtn.style.background = 'linear-gradient(45deg, #666, #888)';
             
-            // First try to load current suggestions from global storage
-            fetch(STORAGE_URL)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else if (response.status === 404) {
-                    return []; // No data exists yet
-                } else {
-                    throw new Error('API request failed');
-                }
-            })
-            .then(suggestions => {
-                const newSuggestion = {
-                    id: Date.now(),
-                    text: suggestionText,
-                    author: suggesterName,
-                    timestamp: new Date().toLocaleDateString()
-                };
-                
-                suggestions.unshift(newSuggestion); // Add to beginning of array
-                saveSuggestions(suggestions);
-                displaySuggestions(suggestions);
-            })
-            .catch(error => {
-                console.log('API error, using localStorage fallback:', error);
-                // Fallback to localStorage
-                const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
-                const newSuggestion = {
-                    id: Date.now(),
-                    text: suggestionText,
-                    author: suggesterName,
-                    timestamp: new Date().toLocaleDateString()
-                };
-                suggestions.unshift(newSuggestion);
-                localStorage.setItem('characterSuggestions', JSON.stringify(suggestions));
-                displaySuggestions(suggestions);
-            })
-            .finally(() => {
-                // Clear form and reset button
-                document.getElementById('suggestionText').value = '';
-                document.getElementById('suggesterName').value = '';
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submitted!';
-                submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
-                
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
-                }, 2000);
-            });
+            // Get current suggestions and add the new one
+            const suggestions = JSON.parse(localStorage.getItem('characterSuggestions') || '[]');
+            
+            const newSuggestion = {
+                id: Date.now(),
+                text: suggestionText,
+                author: suggesterName,
+                timestamp: new Date().toLocaleDateString()
+            };
+            
+            suggestions.unshift(newSuggestion); // Add to beginning of array
+            
+            // Display immediately for better UX
+            displaySuggestions(suggestions);
+            
+            // Save to cloud storage
+            saveSuggestionsToCloud(suggestions);
+            
+            // Clear form and reset button
+            document.getElementById('suggestionText').value = '';
+            document.getElementById('suggesterName').value = '';
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Saved to Cloud!';
+            submitBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #96ceb4)';
+            
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+            }, 3000);
         }
 
         function displaySuggestions(suggestions) {
