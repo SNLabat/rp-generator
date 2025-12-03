@@ -281,7 +281,7 @@
         */
         
         // Criminal-themed character generation
-         const criminalJobs = [
+        const criminalJobs = [
             "bank robber", "car thief", "pickpocket", "burglar", "shoplifter", "con artist", "scam artist",
             "fraudster", "embezzler", "money launderer", "counterfeiter", "forger", "identity thief",
             "hacker", "cybercriminal", "phone scammer", "credit card skimmer", "ATM hacker",
@@ -792,113 +792,6 @@
         ];
 
         // Civilian-themed character generation
-        const civilianPrefixes = [
-            "Overly enthusiastic", "Burnt-out", "Conspiracy theorist", "Passive-aggressive", "Kleptomaniac", 
-            "Narcissistic", "Anxious", "Delusional", "Bitter", "Hypochondriac", "Workaholic", 
-            "Vindictive", "Paranoid", "Melodramatic", "Condescending", "Oversharing", 
-            "Commitment-phobic", "Superstitious", "Gossipy", "Incompetent", "Neurotic", 
-            "Pretentious", "Cynical", "Overly dramatic", "Manic", "Pessimistic", "Obsessive", 
-            "Compulsive", "Perfectionist", "Procrastinating", "Overly optimistic", "Competitive", 
-            "Attention-seeking", "Fame-hungry", "Money-obsessed", "Health-obsessed", "Fitness-obsessed", 
-            "Control-freak", "Micromanaging", "Overprotective", "Helicopter", "Type-A", 
-            "Laid-back", "Hippie", "New-age", "Spiritual", "Meditation-obsessed", "Vegan",
-            "Egotistical", "Self-absorbed", "Drama-loving", "Chaos-creating", "Unpredictable", 
-            "Explosive-tempered", "Short-fused", "Hot-headed", "Cold-hearted", "Emotionally distant", "Clingy", 
-            "Needy", "Avoidant", "Dependent", "Independent", "Rebellious",
-            "Former child-star", "Reformed", "Recovering", "Relapsing", "Functioning", "High-functioning",
-            "Low-energy", "High-energy", "Barely motivated", "Over-achieving",
-            "Chronically unemployed", "Career-obsessed", "Social media addicted", "Technology-phobic",
-            "Eternally optimistic", "Forever pessimistic", "Hopelessly romantic", "Desperately single",
-            "Chronically indecisive", "Perpetually confused", "Constantly complaining", "Always arguing",
-            "Forever planning", "Endlessly talking", "Non-stop texting", "Chronically late",
-            "Always early", "Perpetually sweating", "Constantly sniffling", "Forever crying",
-            "Endlessly laughing", "Overly loud", "Chronically coughing", "Always sneezing",
-            "Forever hungry", "Constantly dieting", "Perpetually tired", "Always caffeinated",
-            "Socially awkward", "Emotionally unavailable", "Trust-issue-having",
-            "Financially irresponsible", "Budget-obsessed", "Coupon-clipping", "Bargain-hunting",
-            "Environmentally obsessed", "Politically passionate", "Debate-loving", "Argument-starting",
-            "Religiously devoted", "Spiritually seeking", "Philosophically confused", "Existentially anxious",
-            // New personality types
-            "Chronically honest", "Pathologically lying", "Aggressively helpful", "Suspiciously friendly",
-            "Inappropriately intimate", "Emotionally volatile", "Perpetually offended", "Chronically bored",
-            "Dangerously curious", "Recklessly impulsive", "Painfully shy", "Obnoxiously confident",
-            "Mysteriously wealthy", "Suspiciously poor", "Inexplicably lucky", "Cursed with bad timing",
-            "Accidentally wise", "Intentionally confusing", "Professionally petty", "Amateur philosopher",
-            "Wannabe influencer", "Failed entrepreneur", "Aspiring cult leader", "Retired rebel",
-            "Undercover nerd", "Closeted romantic", "Secret pessimist", "Hidden optimist",
-            "Frustrated artist", "Disappointed idealist", "Recovering perfectionist", "Reformed slacker",
-            "Chronically misunderstood", "Accidentally profound", "Unintentionally hilarious", "Deliberately obtuse",
-            "Suspiciously knowledgeable", "Mysteriously absent-minded", "Inexplicably popular", "Accidentally intimidating",
-            "Professionally awkward", "Competitively lazy", "Aggressively mediocre", "Passionately indifferent",
-            "Chronically overdressed", "Perpetually underdressed", "Seasonally depressed", "Annually motivated",
-            "Regionally famous", "Locally notorious", "Internationally ignored", "Universally tolerated",
-            "Emotionally constipated", "Spiritually confused", "Physically questionable", "Mentally elsewhere",
-            "Socially exhausted", "Romantically hopeless", "Professionally declining", "Personally evolving",
-            "Culturally oblivious", "Technologically challenged", "Emotionally explosive", "Intellectually curious",
-            "Morally flexible", "Ethically questionable", "Legally concerning", "Medically fascinating",
-            "Historically inaccurate", "Geographically confused", "Mathematically challenged", "Scientifically skeptical",
-            "Artistically pretentious", "Musically tone-deaf", "Literarily snobbish", "Cinematically obsessed",
-            "Gastronomically adventurous", "Nutritionally ignorant", "Physically declining", "Mentally improving",
-            "Emotionally stunted", "Spiritually bankrupt", "Morally superior", "Intellectually inferior",
-            "Socially climbing", "Economically declining", "Politically radical", "Religiously confused",
-            "Romantically tragic", "Comedically gifted", "Dramatically inclined", "Musically challenged",
-            "Artistically blocked", "Creatively bankrupt", "Professionally stagnant", "Personally thriving",
-            "Academically overqualified", "Practically useless", "Theoretically brilliant", "Realistically doomed",
-            "Optimistically deluded", "Pessimistically accurate", "Realistically depressed", "Fantastically hopeful",
-            "Chronically overthinking", "Perpetually underthinking", "Occasionally brilliant", "Frequently confused",
-            "Rarely satisfied", "Often disappointed", "Usually late", "Sometimes early", "Never on time",
-            "Always complaining", "Constantly explaining", "Forever justifying", "Endlessly procrastinating",
-            "Relentlessly pursuing", "Desperately avoiding", "Carefully planning", "Recklessly executing",
-            "Thoughtfully considering", "Impulsively deciding", "Wisely choosing", "Foolishly committing",
-            // Modern Digital Age Prefixes
-            "Chronically online", "Terminally offline", "Algorithm-dependent", "Privacy-paranoid", "Data-hoarding",
-            "Screen-time-obsessed", "Notification-addicted", "Social-media-cleansing", "Digital-minimalist", "Tech-overwhelmed",
-            "Cloud-storage-dependent", "Password-forgetting", "Two-factor-authentication-obsessed", "Cookie-clearing", "Incognito-mode-living",
-            "Subscription-service-accumulating", "Streaming-platform-juggling", "Podcast-binge-listening", "YouTube-rabbit-hole-falling",
-            "TikTok-algorithm-trained", "Instagram-story-stalking", "LinkedIn-humble-bragging", "Twitter-thread-creating",
-            "Reddit-comment-lurking", "Discord-server-hopping", "Slack-notification-ignoring", "Zoom-meeting-dreading",
-            // Social Media & Online Culture Prefixes
-            "Influencer-wannabe", "Follower-count-obsessed", "Engagement-rate-tracking", "Hashtag-researching", "Story-highlight-curating",
-            "Bio-link-optimizing", "Content-calendar-planning", "Brand-partnership-seeking", "Sponsored-post-creating", "Affiliate-link-hiding",
-            "Comment-section-avoiding", "DM-slide-attempting", "Profile-picture-perfecting", "Feed-aesthetic-maintaining", "Stories-screenshot-taking",
-            "Online-persona-crafting", "Digital-identity-managing", "Internet-famous-dreaming", "Viral-content-chasing", "Meme-reference-dropping",
-            // Work & Career Modern Prefixes  
-            "Remote-work-advocating", "Hybrid-schedule-optimizing", "Zoom-background-perfecting", "Slack-status-gaming", "Meeting-free-zone-creating",
-            "Asynchronous-communication-preferring", "Deep-work-protecting", "Productivity-app-collecting", "Time-blocking-obsessed", "Calendar-tetris-playing",
-            "Side-hustle-juggling", "Gig-economy-surviving", "Freelance-feast-or-famine-experiencing", "Passive-income-chasing", "Digital-nomad-wannabe",
-            "LinkedIn-optimization-obsessed", "Personal-brand-building", "Network-effect-leveraging", "Skill-gap-analyzing", "Career-pivot-contemplating",
-            // Health & Wellness Modern Prefixes
-            "Biohacking-experimenting", "Sleep-tracking-obsessed", "Step-counting-competitive", "Heart-rate-monitoring", "Meditation-app-dependent",
-            "Intermittent-fasting-preaching", "Supplement-stack-optimizing", "Macro-tracking-compulsive", "Workout-streak-maintaining", "Recovery-data-analyzing",
-            "Mental-health-app-using", "Therapy-session-scheduling", "Mindfulness-reminder-setting", "Gratitude-journal-keeping", "Mood-tracking-religiously",
-            "Blue-light-filtering", "Posture-correcting", "Ergonomic-setup-perfecting", "Standing-desk-advocating", "Walking-meeting-suggesting",
-            // Environmental & Sustainability Prefixes
-            "Carbon-footprint-calculating", "Zero-waste-attempting", "Sustainable-living-preaching", "Ethical-consumption-researching", "Local-sourcing-prioritizing",
-            "Plastic-free-lifestyle-pursuing", "Renewable-energy-advocating", "Composting-evangelizing", "Thrift-shopping-exclusively", "Repair-cafe-attending",
-            "Plant-based-diet-exploring", "Food-waste-minimizing", "Water-conservation-obsessed", "Energy-efficiency-maximizing", "Eco-anxiety-experiencing",
-            // Financial & Economic Modern Prefixes
-            "FIRE-movement-following", "Index-fund-investing", "Cryptocurrency-day-trading", "NFT-market-analyzing", "DeFi-yield-farming",
-            "Budgeting-app-dependent", "Expense-tracking-compulsive", "Debt-snowball-implementing", "Emergency-fund-building", "Retirement-calculator-obsessed",
-            "Subscription-audit-conducting", "Cashback-optimizing", "Credit-score-monitoring", "Investment-podcast-binging", "Financial-independence-calculating",
-            // Lifestyle & Personal Development Prefixes
-            "Morning-routine-optimizing", "Evening-ritual-creating", "Habit-stacking-practicing", "Atomic-habit-implementing", "Goal-setting-systematizing",
-            "Vision-board-creating", "Manifestation-journal-keeping", "Affirmation-app-using", "Personal-development-binging", "Self-help-book-collecting",
-            "Life-coach-considering", "Personality-test-taking", "Strengths-finder-analyzing", "Myers-Briggs-identifying", "Enneagram-studying",
-            // Entertainment & Media Consumption Prefixes
-            "Binge-watching-professionally", "Streaming-service-optimizing", "Watchlist-curating", "Rating-system-developing", "Review-writing-compulsively",
-            "Spoiler-avoiding-expertly", "Genre-hopping-constantly", "Nostalgic-content-seeking", "Foreign-subtitle-preferring", "Documentary-binging",
-            "Podcast-speed-listening", "Audiobook-multitasking", "True-crime-obsessed", "Reality-TV-guilty-pleasure-having", "Animation-adult-watching",
-            // Food & Cooking Modern Prefixes
-            "Meal-prep-Sunday-practicing", "Recipe-app-collecting", "Food-Instagram-posting", "Restaurant-review-writing", "Cooking-show-replicating",
-            "Ingredient-substitution-mastering", "Dietary-restriction-accommodating", "Farmers-market-supporting", "Food-waste-hating", "Leftover-transforming",
-            "Spice-blend-experimenting", "Fermentation-hobby-developing", "Sourdough-starter-maintaining", "Air-fryer-evangelizing", "Instant-pot-depending-on",
-            // Transportation & Mobility Prefixes
-            "Car-free-lifestyle-embracing", "Public-transit-optimizing", "Bike-commuting-advocating", "Ride-sharing-calculating", "Micro-mobility-exploring",
-            "Traffic-app-dependent", "Route-optimization-obsessed", "Parking-app-using", "EV-charging-planning", "Carbon-offset-purchasing",
-            // Housing & Living Situation Prefixes
-            "Tiny-house-movement-considering", "Minimalism-practicing", "Marie-Kondo-method-following", "Feng-shui-arranging", "Smart-home-automating",
-            "Energy-efficient-upgrading", "Space-optimization-mastering", "Roommate-compatibility-analyzing", "Neighborhood-gentrification-witnessing", "Housing-market-timing"
-        ];
 
         const civilianJobs = [
             "televangilist", "yoga instructor", "librarian", "meteorologist", "real estate agent",
@@ -1837,40 +1730,6 @@
         ];
 
         // Government Worker character generation
-        const governmentPrefixes = [
-            "Bureaucratic", "Overworked", "Underpaid", "Pension-obsessed", "Red-tape-loving", "Protocol-following",
-            "Regulation-enforcing", "Form-requiring", "Committee-forming", "Meeting-scheduling", "Procedure-following",
-            "Hierarchy-respecting", "Chain-of-command-following", "Policy-implementing", "Compliance-ensuring",
-            "Audit-fearing", "Inspection-dreading", "Review-preparing", "Documentation-obsessed", "Filing-compulsive",
-            "Deadline-missing", "Budget-cutting", "Cost-saving", "Efficiency-lacking", "Process-improving",
-            "Union-representing", "Grievance-filing", "Seniority-claiming", "Tenure-protecting", "Benefits-maximizing",
-            "Sick-leave-using", "Vacation-hoarding", "Overtime-avoiding", "Lunch-break-extending", "Coffee-break-taking",
-            "Retirement-counting", "Years-of-service-bragging", "Pension-calculating", "Health-insurance-using",
-            "Dental-coverage-maximizing", "Vision-benefits-claiming", "Flex-spending-optimizing", "401k-contributing",
-            "Whistleblowing", "Ethics-reporting", "Fraud-investigating", "Corruption-exposing", "Transparency-advocating",
-            "Public-service-dedicated", "Taxpayer-serving", "Community-focused", "Citizen-helping", "Democracy-supporting",
-            "Constitution-defending", "Rights-protecting", "Justice-seeking", "Law-enforcing", "Order-maintaining",
-            "Safety-ensuring", "Security-providing", "Emergency-responding", "Crisis-managing", "Disaster-preparing",
-            "Information-disseminating", "Education-providing", "Training-conducting", "Certification-issuing", "License-granting",
-            "Permit-processing", "Application-reviewing", "Inspection-conducting", "Violation-citing", "Fine-issuing",
-            "Court-appearing", "Testimony-giving", "Evidence-collecting", "Investigation-conducting", "Report-writing",
-            "Data-analyzing", "Statistics-compiling", "Research-conducting", "Study-performing", "Survey-administering",
-            "Program-managing", "Project-coordinating", "Initiative-leading", "Task-force-joining", "Committee-serving",
-            "Board-attending", "Council-participating", "Commission-serving", "Panel-judging", "Review-conducting",
-            "Interagency-coordinating", "Cross-departmental-collaborating", "Multi-jurisdictional-working", "Federal-state-liaising",
-            "Public-private-partnering", "Stakeholder-engaging", "Community-outreaching", "Public-meeting-hosting",
-            "Town-hall-organizing", "Forum-moderating", "Feedback-collecting", "Comment-period-managing",
-            "Rulemaking-participating", "Regulation-drafting", "Policy-developing", "Legislation-supporting",
-            "Amendment-proposing", "Bill-analyzing", "Law-interpreting", "Statute-implementing", "Ordinance-enforcing",
-            "Code-updating", "Standard-setting", "Guideline-establishing", "Best-practice-developing", "Framework-creating",
-            "System-modernizing", "Technology-upgrading", "Digital-transforming", "Automation-implementing", "AI-integrating",
-            "Cybersecurity-maintaining", "Data-protecting", "Privacy-ensuring", "Transparency-balancing", "Access-controlling",
-            "Records-managing", "Archive-maintaining", "History-preserving", "Legacy-system-supporting", "Migration-planning",
-            "Backup-maintaining", "Recovery-planning", "Continuity-ensuring", "Resilience-building", "Redundancy-creating",
-            "Quality-assuring", "Performance-measuring", "Outcome-evaluating", "Impact-assessing", "Effectiveness-analyzing",
-            "Efficiency-improving", "Cost-benefit-analyzing", "Resource-allocating", "Priority-setting", "Strategy-developing",
-            "Vision-articulating", "Mission-fulfilling", "Value-demonstrating", "Purpose-serving", "Goal-achieving"
-        ];
 
         const governmentJobs = [
             // Federal Agencies
@@ -2071,26 +1930,23 @@
         ];
 
         function generateCharacter(type = 'civilian') {
-            let prefix, job, quirk;
+            let job, quirk;
             
             if (type === 'criminal') {
                 // Generate criminal character
-                prefix = criminalPrefixes[Math.floor(Math.random() * criminalPrefixes.length)];
                 job = criminalJobs[Math.floor(Math.random() * criminalJobs.length)];
                 quirk = criminalQuirks[Math.floor(Math.random() * criminalQuirks.length)];
             } else if (type === 'government') {
                 // Generate government worker character
-                prefix = governmentPrefixes[Math.floor(Math.random() * governmentPrefixes.length)];
                 job = governmentJobs[Math.floor(Math.random() * governmentJobs.length)];
                 quirk = governmentQuirks[Math.floor(Math.random() * governmentQuirks.length)];
             } else {
                 // Generate civilian character
-                prefix = civilianPrefixes[Math.floor(Math.random() * civilianPrefixes.length)];
                 job = civilianJobs[Math.floor(Math.random() * civilianJobs.length)];
                 quirk = allCivilianQuirks[Math.floor(Math.random() * allCivilianQuirks.length)];
             }
             
-            const characterType = `${prefix} ${job}`;
+            const characterType = job;
             
             const typeElement = document.querySelector('.character-type');
             const quirkElement = document.querySelector('.character-quirk');
